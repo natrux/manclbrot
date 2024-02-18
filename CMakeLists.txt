@@ -19,7 +19,16 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+
+find_package(SDL2 REQUIRED)
+
+
 add_executable(manclbrot
 	src/main.cpp
 )
+
+target_link_libraries(manclbrot
+	${SDL2_LIBRARIES}
+)
+
 
