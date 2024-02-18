@@ -1,4 +1,7 @@
 #include <string>
+#include <vector>
+#include <chrono>
+#include <random>
 #include <stdexcept>
 
 #include <SDL2/SDL.h>
@@ -34,16 +37,57 @@ static unsigned long mandelbrot_test(double x_0, double y_0, unsigned long limit
 
 
 
-static void writepixel(void *pixels, const SDL_PixelFormat *format, int pitch, int x, int y, uint32_t color){
-	char *src = reinterpret_cast<char *>(&color) + (sizeof(color) - format->BytesPerPixel);
-	char *dst = reinterpret_cast<char *>(pixels) + y*pitch + x*format->BytesPerPixel;
-	memcpy(dst, src, format->BytesPerPixel);
+static void writepixel(void *pixels, uint8_t bytes_per_pixel, int pitch, int x, int y, uint32_t color){
+	char *src = reinterpret_cast<char *>(&color) + (sizeof(color) - bytes_per_pixel);
+	char *dst = reinterpret_cast<char *>(pixels) + y*pitch + x*bytes_per_pixel;
+	memcpy(dst, src, bytes_per_pixel);
 }
 
 static void writepixel_rgb(void *pixels, const SDL_PixelFormat *format, int pitch, int x, int y, uint8_t r, uint8_t g, uint8_t b){
 	const uint32_t rgb = SDL_MapRGBA(format, r, g, b, 255);
-        writepixel(pixels, format, pitch, x, y, rgb);
+        writepixel(pixels, format->BytesPerPixel, pitch, x, y, rgb);
 }
+
+
+static std::vector<uint32_t> make_random_colors(size_t count, const SDL_PixelFormat *format){
+	std::random_device device;
+	std::mt19937_64 generator(device());
+	const auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	const auto seed = static_cast<decltype(generator)::result_type>(time);
+	generator.seed(seed);
+
+	int16_t r = 0, g = 0, b = 0;
+	int8_t dr = 0, dg = 0, db = 0;
+	const uint8_t min_delta = 1;
+	const uint8_t max_delta = 20;
+	std::uniform_int_distribution<int8_t> distribution(min_delta, max_delta);
+
+	std::vector<uint32_t> result;
+	result.resize(count);
+	result[0] = SDL_MapRGBA(format, r, g, b, 255);
+	for(size_t i=1; i<count; i++){
+		if(r == 0 || r == 255){
+			const int8_t d = distribution(generator);
+			dr = (r == 0) ? d : -d;
+		}
+		if(g == 0 || g == 255){
+			const int8_t d = distribution(generator);
+			dg = (g == 0) ? d : -d;
+		}
+		if(b == 0 || b == 255){
+			const int8_t d = distribution(generator);
+			db = (b == 0) ? d : -d;
+		}
+
+		r = std::min(std::max(r+dr, 0), 255);
+		g = std::min(std::max(g+dg, 0), 255);
+		b = std::min(std::max(b+db, 0), 255);
+
+		result[i] = SDL_MapRGBA(format, r, g, b, 255);
+	}
+	return result;
+}
+
 
 
 int main(int /*argc*/, char **/*argv*/){
@@ -52,6 +96,7 @@ int main(int /*argc*/, char **/*argv*/){
 	double zoom = 0.005;
 	double offset_x = screen_width * zoom * 2 / 3;
 	double offset_y = screen_height * zoom / 2;
+	const unsigned long iter_limit = 100;
 
 	if(SDL_Init(SDL_INIT_VIDEO) < 0){
 		throw std::runtime_error("SDL_Init() failed with: " + std::string(SDL_GetError()));
@@ -81,6 +126,7 @@ int main(int /*argc*/, char **/*argv*/){
 	if(!format){
 		throw std::runtime_error("SDL_AllocFormat() failed with: " + std::string(SDL_GetError()));
 	}
+	const auto colors = make_random_colors(iter_limit, format);
 
 
 	void *pixels;
@@ -90,12 +136,8 @@ int main(int /*argc*/, char **/*argv*/){
 	}
 	for(int x=0; x<screen_width; x++){
 		for(int y=0; y<screen_height; y++){
-			const auto test = mandelbrot_test(x*zoom-offset_x, y*zoom-offset_y, 100);
-			if(test == 0){
-				writepixel_rgb(pixels, format, pitch, x, y, 0, 0, 0);
-			}else{
-				writepixel_rgb(pixels, format, pitch, x, y, 255, 255, 255);
-			}
+			const auto test = mandelbrot_test(x*zoom-offset_x, y*zoom-offset_y, iter_limit);
+			writepixel(pixels, format->BytesPerPixel, pitch, x, y, colors[test]);
 		}
 	}
 	SDL_UnlockTexture(texture);
