@@ -43,15 +43,19 @@ void MandelbrotRendererInterface::set_iter_limit(unsigned long iter_limit_){
 	const uint8_t max_delta = 20;
 	std::uniform_int_distribution<int8_t> distribution(min_delta, max_delta);
 
+	int16_t r, g, b;
+	int8_t dr, dg, db;
+	{
+		const auto &last_color = color_gen.back();
+		r = last_color.r;
+		g = last_color.g;
+		b = last_color.b;
+		dr = last_color.dr;
+		dg = last_color.dg;
+		db = last_color.db;
+	}
 	colors.resize(iter_limit_);
 	color_gen.resize(iter_limit_);
-	const auto &last_color = color_gen.back();
-	int16_t r = last_color.r;
-	int16_t g = last_color.g;
-	int16_t b = last_color.b;
-	int8_t dr = last_color.dr;
-	int8_t dg = last_color.dg;
-	int8_t db = last_color.db;
 	for(unsigned long i=iter_limit; i<iter_limit_; i++){
 		if(r == 0 || r == 255){
 			const int8_t d = distribution(random_generator);
