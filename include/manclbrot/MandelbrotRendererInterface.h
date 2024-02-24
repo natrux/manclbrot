@@ -18,8 +18,8 @@ public:
 protected:
 	int screen_width;
 	int screen_height;
-	unsigned long iter_limit = 1;
 	uint32_t get_color(size_t iter) const;
+	unsigned long get_iter_limit() const;
 
 private:
 	struct color_gen_t{

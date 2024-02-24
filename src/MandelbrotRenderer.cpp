@@ -7,6 +7,7 @@ MandelbrotRenderer::MandelbrotRenderer(int screen_width_, int screen_height_, SD
 
 
 void MandelbrotRenderer::draw(double zoom, double offset_x, double offset_y, void *pixels, uint8_t bytes_per_pixel, int pitch) const{
+	const auto iter_limit = get_iter_limit();
 	for(int x=0; x<screen_width; x++){
 		for(int y=0; y<screen_height; y++){
 			const auto test = mandelbrot_test(x*zoom-offset_x, y*zoom-offset_y, iter_limit);

@@ -34,10 +34,11 @@ MandelbrotRendererInterface::~MandelbrotRendererInterface(){
 }
 
 
-void MandelbrotRendererInterface::set_iter_limit(unsigned long iter_limit_){
-	if(iter_limit_ <= 0){
+void MandelbrotRendererInterface::set_iter_limit(unsigned long iter_limit){
+	if(iter_limit <= 0){
 		throw std::logic_error("iteration limit must be positive");
 	}
+	const auto old_iter_limit = get_iter_limit();
 
 	const uint8_t min_delta = 1;
 	const uint8_t max_delta = 20;
@@ -54,9 +55,9 @@ void MandelbrotRendererInterface::set_iter_limit(unsigned long iter_limit_){
 		dg = last_color.dg;
 		db = last_color.db;
 	}
-	colors.resize(iter_limit_);
-	color_gen.resize(iter_limit_);
-	for(unsigned long i=iter_limit; i<iter_limit_; i++){
+	colors.resize(iter_limit);
+	color_gen.resize(iter_limit);
+	for(unsigned long i=old_iter_limit; i<iter_limit; i++){
 		if(r == 0 || r == 255){
 			const int8_t d = distribution(random_generator);
 			dr = (r == 0) ? d : -d;
@@ -84,12 +85,11 @@ void MandelbrotRendererInterface::set_iter_limit(unsigned long iter_limit_){
 		color_gen[i] = color;
 		colors[i] = SDL_MapRGBA(pixel_format, r, g, b, 255);
 	}
-	iter_limit = iter_limit_;
 }
 
 
 void MandelbrotRendererInterface::renew_colors(){
-	const auto old_limit = iter_limit;
+	const auto old_limit = colors.size();
 	set_iter_limit(1);
 	set_iter_limit(old_limit);
 }
@@ -108,5 +108,10 @@ void MandelbrotRendererInterface::draw(double zoom, double offset_x, double offs
 
 uint32_t MandelbrotRendererInterface::get_color(size_t iter) const{
 	return colors.at(iter);
+}
+
+
+unsigned long MandelbrotRendererInterface::get_iter_limit() const{
+	return colors.size();
 }
 
