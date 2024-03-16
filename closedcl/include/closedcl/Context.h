@@ -32,6 +32,11 @@ public:
 		auto buffer = create_buffer_internal(flags, num_entries*sizeof(T));
 		return std::make_shared<Vector<T>>(buffer);
 	}
+	template<class T, size_t N>
+	std::shared_ptr<Array<T, N>> create_array(cl_mem_flags flags){
+		auto buffer = create_buffer_internal(flags, N*sizeof(T));
+		return std::make_shared<Array<T, N>>(buffer);
+	}
 
 private:
 	cl_context context;

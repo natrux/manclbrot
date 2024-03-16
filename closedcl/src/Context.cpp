@@ -28,7 +28,10 @@ Context::Context(const platform_t &platform, cl_device_type type):
 Context::Context(const platform_t &platform, const std::vector<device_t> &devices_):
 	devices(devices_)
 {
-	const cl_context_properties properties[] = {CL_CONTEXT_PLATFORM, reinterpret_cast<cl_context_properties>(platform.id), 0};
+	const cl_context_properties properties[] = {
+		CL_CONTEXT_PLATFORM, reinterpret_cast<cl_context_properties>(platform.id),
+		0
+	};
 	std::vector<cl_device_id> device_ids;
 	for(const auto &device : devices){
 		device_ids.push_back(device.id);
