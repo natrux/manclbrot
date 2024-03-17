@@ -35,8 +35,6 @@ public:
 		set_argument(find_argument(name), value);
 	}
 
-	void execute(CommandQueue &queue, size_t global);
-
 	cl_kernel data() const;
 
 private:

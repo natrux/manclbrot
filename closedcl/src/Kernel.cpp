@@ -39,11 +39,6 @@ Kernel::~Kernel(){
 }
 
 
-void Kernel::execute(CommandQueue &queue, size_t global){
-	queue.execute(*this, global);
-}
-
-
 cl_kernel Kernel::data() const{
 	return kernel;
 }

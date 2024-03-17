@@ -4,6 +4,8 @@
 #include <closedcl/device_t.h>
 #include <closedcl/CommandQueue.h>
 #include <closedcl/Program.h>
+#include <closedcl/Vector.h>
+#include <closedcl/Array.h>
 
 #include <memory>
 
