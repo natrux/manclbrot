@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(closedcl CXX)
+project(closedcl-examples CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -20,30 +20,14 @@ endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
-find_package(OpenCL REQUIRED)
-
 add_definitions(-D CL_TARGET_OPENCL_VERSION=120)
-add_subdirectory(examples)
 
 
-
-add_library(closedcl SHARED
-	src/platform_t.cpp
-	src/device_t.cpp
-	src/Buffer.cpp
-	src/CommandQueue.cpp
-	src/Kernel.cpp
-	src/Program.cpp
-	src/Context.cpp
-	src/error.cpp
+add_executable(square
+	square.cpp
 )
 
-target_include_directories(closedcl PUBLIC
-	include
+target_link_libraries(square
+	closedcl
 )
-
-target_link_libraries(closedcl
-	${OpenCL_LIBRARIES}
-)
-
 
