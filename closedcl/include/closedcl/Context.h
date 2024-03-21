@@ -28,9 +28,9 @@ public:
 	std::shared_ptr<CommandQueue> create_queue();
 	std::shared_ptr<CommandQueue> create_queue(const device_t &device);
 	std::shared_ptr<Program> create_program(const std::vector<std::string> &sources);
-	std::shared_ptr<Buffer> create_buffer(cl_mem_flags flags, size_t size);
+	std::shared_ptr<Buffer> create_buffer(cl_mem_flags flags, size_t size) const;
 	template<class T>
-	std::shared_ptr<Vector<T>> create_vector(cl_mem_flags flags, size_t num_entries){
+	std::shared_ptr<Vector<T>> create_vector(cl_mem_flags flags, size_t num_entries) const{
 		auto buffer = create_buffer_internal(flags, num_entries*sizeof(T));
 		return std::make_shared<Vector<T>>(buffer);
 	}
@@ -43,7 +43,7 @@ public:
 private:
 	cl_context context;
 	std::vector<device_t> devices;
-	cl_mem create_buffer_internal(cl_mem_flags flags, size_t size);
+	cl_mem create_buffer_internal(cl_mem_flags flags, size_t size) const;
 };
 
 

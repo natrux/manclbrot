@@ -8,7 +8,7 @@
 
 class MandelbrotRendererInterface{
 public:
-	MandelbrotRendererInterface(int screen_width, int screen_height, SDL_Texture *texture);
+	MandelbrotRendererInterface(unsigned int screen_width, unsigned int screen_height, SDL_Texture *texture);
 	virtual ~MandelbrotRendererInterface();
 	void set_iter_limit(unsigned long iter_limit);
 	void renew_colors();
@@ -16,10 +16,12 @@ public:
 	void draw(double zoom, double offset_x, double offset_y) const;
 
 protected:
-	int screen_width;
-	int screen_height;
+	unsigned int screen_width;
+	unsigned int screen_height;
 	uint32_t get_color(size_t iter) const;
-	unsigned long get_iter_limit() const;
+	std::vector<uint32_t> get_colors() const;
+	size_t get_iter_limit() const;
+	void write_pixel(void *pixels, uint8_t bytes_per_pixel, int pitch, int x, int y, uint32_t color) const;
 
 private:
 	struct color_gen_t{

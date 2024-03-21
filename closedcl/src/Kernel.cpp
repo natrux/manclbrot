@@ -26,7 +26,10 @@ Kernel::Kernel(cl_kernel kernel_, size_t max_name_size):
 		if(error != CL_SUCCESS){
 			throw std::runtime_error("clGetKernelArgInfo(CL_KERNEL_ARG_NAME) failed with: " + error_string(error));
 		}
-		name_chr.resize(actual_size);
+		if(actual_size == 0){
+			throw std::runtime_error("Kernel argument name has length 0");
+		}
+		name_chr.resize(actual_size-1);
 
 		const std::string name(name_chr.begin(), name_chr.end());
 		arguments[name] = i;

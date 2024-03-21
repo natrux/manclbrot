@@ -18,6 +18,7 @@ else()
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+add_definitions(-D CL_TARGET_OPENCL_VERSION=120)
 
 add_subdirectory(closedcl)
 
@@ -27,6 +28,7 @@ find_package(SDL2 REQUIRED)
 add_executable(manclbrot
 	src/MandelbrotRendererInterface.cpp
 	src/MandelbrotRenderer.cpp
+	src/CL_MandelbrotRenderer.cpp
 	src/main.cpp
 )
 
@@ -35,6 +37,7 @@ target_include_directories(manclbrot PUBLIC
 )
 
 target_link_libraries(manclbrot
+	closedcl
 	${SDL2_LIBRARIES}
 )
 

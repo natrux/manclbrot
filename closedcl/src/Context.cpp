@@ -91,13 +91,13 @@ std::shared_ptr<Program> Context::create_program(const std::vector<std::string> 
 }
 
 
-std::shared_ptr<Buffer> Context::create_buffer(cl_mem_flags flags, size_t size){
+std::shared_ptr<Buffer> Context::create_buffer(cl_mem_flags flags, size_t size) const{
 	auto buffer = create_buffer_internal(flags, size);
 	return std::make_shared<Buffer>(buffer);
 }
 
 
-cl_mem Context::create_buffer_internal(cl_mem_flags flags, size_t size){
+cl_mem Context::create_buffer_internal(cl_mem_flags flags, size_t size) const{
 	cl_int error = CL_SUCCESS;
 	cl_mem buffer = clCreateBuffer(context, flags, size, NULL, &error);
 	if(error != CL_SUCCESS){

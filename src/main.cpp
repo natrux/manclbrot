@@ -1,4 +1,6 @@
 #include <manclbrot/MandelbrotRenderer.h>
+#include <manclbrot/CL_MandelbrotRenderer.h>
+#include <closedcl/Context.h>
 
 #include <string>
 #include <stdexcept>
@@ -9,13 +11,13 @@
 
 
 int main(int /*argc*/, char **/*argv*/){
-	const int screen_width = 640;
-	const int screen_height = 480;
+	const unsigned int screen_width = 1280;
+	const unsigned int screen_height = 720;
 	double zoom = 0.005;
 	double offset_x = screen_width * zoom * 2 / 3;
 	double offset_y = screen_height * zoom / 2;
 	unsigned long iter_limit = 100;
-	const bool use_opencl = false;
+	const bool use_opencl = true;
 
 	if(SDL_Init(SDL_INIT_VIDEO) < 0){
 		throw std::runtime_error("SDL_Init() failed with: " + std::string(SDL_GetError()));
@@ -40,22 +42,19 @@ int main(int /*argc*/, char **/*argv*/){
 		throw std::runtime_error("SDL_QueryTexture() failed with: " + std::string(SDL_GetError()));
 	}
 
-
 	std::unique_ptr<MandelbrotRendererInterface> mandelbrot_renderer;
 	if(use_opencl){
-		throw std::logic_error("Not implemented");
+		mandelbrot_renderer = std::make_unique<CL_MandelbrotRenderer>(screen_width, screen_height, texture, true);
 	}else{
 		mandelbrot_renderer = std::make_unique<MandelbrotRenderer>(screen_width, screen_height, texture);
 	}
 	mandelbrot_renderer->set_iter_limit(iter_limit);
 
-
-
 	bool do_run = true;
 	bool do_draw = true;
 	while(do_run){
 		if(do_draw){
-		mandelbrot_renderer->draw(zoom, offset_x, offset_y);
+			mandelbrot_renderer->draw(zoom, offset_x, offset_y);
 			if(SDL_RenderClear(renderer) < 0){
 				throw std::runtime_error("SDL_RenderClear() failed with: " + std::string(SDL_GetError()));
 			}

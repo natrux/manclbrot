@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 
-MandelbrotRendererInterface::MandelbrotRendererInterface(int screen_width_, int screen_height_, SDL_Texture *texture_):
+MandelbrotRendererInterface::MandelbrotRendererInterface(unsigned int screen_width_, unsigned int screen_height_, SDL_Texture *texture_):
 	screen_width(screen_width_),
 	screen_height(screen_height_),
 	random_generator(random_device()),
@@ -111,7 +111,19 @@ uint32_t MandelbrotRendererInterface::get_color(size_t iter) const{
 }
 
 
-unsigned long MandelbrotRendererInterface::get_iter_limit() const{
+std::vector<uint32_t> MandelbrotRendererInterface::get_colors() const{
+	return colors;
+}
+
+
+size_t MandelbrotRendererInterface::get_iter_limit() const{
 	return colors.size();
+}
+
+
+void MandelbrotRendererInterface::write_pixel(void *pixels, uint8_t bytes_per_pixel, int pitch, int x, int y, uint32_t color) const{
+	char *src = reinterpret_cast<char *>(&color) + (sizeof(color) - bytes_per_pixel);
+	char *dst = reinterpret_cast<char *>(pixels) + y*pitch + x*bytes_per_pixel;
+	memcpy(dst, src, bytes_per_pixel);
 }
 
