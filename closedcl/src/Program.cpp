@@ -50,14 +50,13 @@ void Program::build(const std::vector<std::string> &options, const std::vector<d
 				log += entry;
 			}
 			throw std::runtime_error(str_error + " and build log:\n" + log);
-		}else{
-			throw std::runtime_error(str_error);
 		}
+		throw std::runtime_error(str_error);
 	}
 }
 
 
-std::shared_ptr<Kernel> Program::create_kernel(const std::string &name){
+std::shared_ptr<Kernel> Program::create_kernel(const std::string &name) const{
 	cl_int error = CL_SUCCESS;
 	auto kernel = clCreateKernel(program, name.c_str(), &error);
 	if(error != CL_SUCCESS){

@@ -25,9 +25,9 @@ public:
 	Context &operator=(const Context &other) = delete;
 
 	std::vector<device_t> get_devices() const;
-	std::shared_ptr<CommandQueue> create_queue();
-	std::shared_ptr<CommandQueue> create_queue(const device_t &device);
-	std::shared_ptr<Program> create_program(const std::vector<std::string> &sources);
+	std::shared_ptr<CommandQueue> create_queue() const;
+	std::shared_ptr<CommandQueue> create_queue(const device_t &device) const;
+	std::shared_ptr<Program> create_program(const std::vector<std::string> &sources) const;
 	std::shared_ptr<Buffer> create_buffer(cl_mem_flags flags, size_t size) const;
 	template<class T>
 	std::shared_ptr<Vector<T>> create_vector(cl_mem_flags flags, size_t num_entries) const{
@@ -35,7 +35,7 @@ public:
 		return std::make_shared<Vector<T>>(buffer);
 	}
 	template<class T, size_t N>
-	std::shared_ptr<Array<T, N>> create_array(cl_mem_flags flags){
+	std::shared_ptr<Array<T, N>> create_array(cl_mem_flags flags) const{
 		auto buffer = create_buffer_internal(flags, N*sizeof(T));
 		return std::make_shared<Array<T, N>>(buffer);
 	}

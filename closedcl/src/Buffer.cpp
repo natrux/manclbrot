@@ -16,7 +16,7 @@ Buffer::~Buffer(){
 }
 
 
-void Buffer::read(CommandQueue &queue, void *data, size_t size){
+void Buffer::read(CommandQueue &queue, void *data, size_t size) const{
 	queue.read(*this, data, size);
 }
 

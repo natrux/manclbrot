@@ -47,7 +47,7 @@ cl_kernel Kernel::data() const{
 }
 
 
-cl_uint Kernel::find_argument(const std::string &name){
+cl_uint Kernel::find_argument(const std::string &name) const{
 	const auto find = arguments.find(name);
 	if(find == arguments.end()){
 		throw std::logic_error("No such argument: " + name);

@@ -54,7 +54,7 @@ std::vector<device_t> Context::get_devices() const{
 }
 
 
-std::shared_ptr<CommandQueue> Context::create_queue(){
+std::shared_ptr<CommandQueue> Context::create_queue() const{
 	if(devices.empty()){
 		throw std::logic_error("No devices in current OpenCL context");
 	}
@@ -62,7 +62,7 @@ std::shared_ptr<CommandQueue> Context::create_queue(){
 }
 
 
-std::shared_ptr<CommandQueue> Context::create_queue(const device_t &device){
+std::shared_ptr<CommandQueue> Context::create_queue(const device_t &device) const{
 	const cl_command_queue_properties properties = 0;
 	//const cl_queue_properties properties = 0;
 	cl_int error = CL_SUCCESS;
@@ -75,7 +75,7 @@ std::shared_ptr<CommandQueue> Context::create_queue(const device_t &device){
 }
 
 
-std::shared_ptr<Program> Context::create_program(const std::vector<std::string> &sources){
+std::shared_ptr<Program> Context::create_program(const std::vector<std::string> &sources) const{
 	std::vector<const char *> sources_;
 	std::vector<size_t> sizes;
 	for(const auto &source : sources){

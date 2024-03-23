@@ -15,7 +15,7 @@ public:
 	Buffer(const Buffer &other) = delete;
 	Buffer &operator=(const Buffer &other) = delete;
 
-	void read(CommandQueue &queue, void *data, size_t size);
+	void read(CommandQueue &queue, void *data, size_t size) const;
 	void write(CommandQueue &queue, const void *data, size_t size);
 
 	cl_mem data() const;

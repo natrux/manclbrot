@@ -41,7 +41,7 @@ private:
 	cl_kernel kernel;
 	std::map<std::string, cl_uint> arguments;
 
-	cl_uint find_argument(const std::string &name);
+	cl_uint find_argument(const std::string &name) const;
 	void set_argument_internal(cl_uint index, size_t size, const void *value);
 	template<class T>
 	void set_argument_internal(cl_uint index, const T &value){

@@ -21,7 +21,7 @@ public:
 	Program &operator=(const Program &other) = delete;
 
 	void build(const std::vector<std::string> &options, const std::vector<device_t> &devices);
-	std::shared_ptr<Kernel> create_kernel(const std::string &name);
+	std::shared_ptr<Kernel> create_kernel(const std::string &name) const;
 
 private:
 	cl_program program;
