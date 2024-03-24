@@ -5,19 +5,58 @@
 #include <string>
 #include <stdexcept>
 #include <memory>
+#include <iostream>
 
 #include <SDL2/SDL.h>
 
 
+static void read_args(const std::vector<std::string> &args, bool &usage, int &screen_width, int &screen_height, bool &use_opencl){
+	auto iter = args.begin();
+	while(iter != args.end()){
+		const std::string &arg = *iter;
+		if(arg == "--help"){
+			usage = true;
+		}else if(arg == "--screen_width"){
+			iter++;
+			if(iter != args.end()){
+				screen_width = std::stoi(*iter);
+			}
+		}else if(arg == "--screen_height"){
+			iter++;
+			if(iter != args.end()){
+				screen_height = std::stoi(*iter);
+			}
+		}else if(arg == "--use_opencl"){
+			iter++;
+			if(iter != args.end()){
+				const std::string &value = *iter;
+				if(value == "true"){
+					use_opencl = true;
+				}else if(value == "false"){
+					use_opencl = false;
+				}
+			}
+		}
+		iter++;
+	}
+}
 
-int main(int /*argc*/, char **/*argv*/){
-	const unsigned int screen_width = 1280;
-	const unsigned int screen_height = 720;
+
+static void print_usage(const std::string &name){
+	std::cout << "Usage: " << name << " [OPTION VALUE]" << std::endl;
+	std::cout << "Where OPTIONs are any of the following:" << std::endl;
+	std::cout << "\t--help: Show this usage and exit" << std::endl;
+	std::cout << "\t--screen_width <INT>: Set the screen width" << std::endl;
+	std::cout << "\t--screen_height <INT>: Set the screen height" << std::endl;
+	std::cout << "\t--use_opencl <BOOL>: Whether to use OpenCL rendering" << std::endl;
+}
+
+
+static void manclbrot(int screen_width, int screen_height, bool use_opencl){
 	double zoom = 0.005;
 	double offset_x = screen_width * zoom * 2 / 3;
 	double offset_y = screen_height * zoom / 2;
 	unsigned long iter_limit = 100;
-	const bool use_opencl = true;
 
 	if(SDL_Init(SDL_INIT_VIDEO) < 0){
 		throw std::runtime_error("SDL_Init() failed with: " + std::string(SDL_GetError()));
@@ -42,17 +81,32 @@ int main(int /*argc*/, char **/*argv*/){
 		throw std::runtime_error("SDL_QueryTexture() failed with: " + std::string(SDL_GetError()));
 	}
 
-	std::unique_ptr<MandelbrotRendererInterface> mandelbrot_renderer;
+	std::vector<std::unique_ptr<MandelbrotRendererInterface>> mandelbrot_renderers;
 	if(use_opencl){
-		mandelbrot_renderer = std::make_unique<CL_MandelbrotRenderer>(screen_width, screen_height, texture, true);
-	}else{
-		mandelbrot_renderer = std::make_unique<MandelbrotRenderer>(screen_width, screen_height, texture);
+		try{
+			auto mandelbrot_renderer = std::make_unique<CL_MandelbrotRenderer>("OpenCL", screen_width, screen_height, texture, true);
+			mandelbrot_renderer->set_iter_limit(iter_limit);
+			mandelbrot_renderers.push_back(std::move(mandelbrot_renderer));
+		}catch(const std::exception &err){
+			std::cerr << "Failed to create OpenCL Mandelbrot renderer: " << err.what() << std::endl;
+		}
 	}
-	mandelbrot_renderer->set_iter_limit(iter_limit);
+	try{
+		auto mandelbrot_renderer = std::make_unique<MandelbrotRenderer>("CPU", screen_width, screen_height, texture);
+		mandelbrot_renderer->set_iter_limit(iter_limit);
+		mandelbrot_renderers.push_back(std::move(mandelbrot_renderer));
+	}catch(const std::exception &err){
+		std::cerr << "Failed to create Mandelbrot renderer: " << err.what() << std::endl;
+	}
+	if(mandelbrot_renderers.empty()){
+		throw std::runtime_error("No renderers available");
+	}
+	auto current_renderer = mandelbrot_renderers.begin();
 
 	bool do_run = true;
 	bool do_draw = true;
 	while(do_run){
+		auto &mandelbrot_renderer = *current_renderer;
 		if(do_draw){
 			mandelbrot_renderer->draw(zoom, offset_x, offset_y);
 			if(SDL_RenderClear(renderer) < 0){
@@ -119,6 +173,13 @@ int main(int /*argc*/, char **/*argv*/){
 				mandelbrot_renderer->set_iter_limit(iter_limit);
 				do_draw = true;
 				break;
+			case SDLK_r:
+				current_renderer++;
+				if(current_renderer == mandelbrot_renderers.end()){
+					current_renderer = mandelbrot_renderers.begin();
+				}
+				do_draw = true;
+				break;
 			default:
 				break;
 			}
@@ -130,8 +191,41 @@ int main(int /*argc*/, char **/*argv*/){
 	SDL_DestroyWindow(window);
 
 	SDL_Quit();
+}
+
+
+int main(int argc, char **argv){
+	int screen_width = 1280;
+	int screen_height = 720;
+	bool use_opencl = true;
+	try{
+		bool usage = false;
+		const std::string name = argv[0];
+		std::vector<std::string> args;
+		for(int i=1; i<argc; i++){
+			args.push_back(argv[i]);
+		}
+		read_args(args, usage, screen_width, screen_height, use_opencl);
+		if(usage){
+			print_usage(name);
+			return 0;
+		}
+	}catch(const std::exception &err){
+		std::cerr << err.what() << std::endl;
+		return 1;
+	}
+
+	try{
+		manclbrot(screen_width, screen_height, use_opencl);
+	}catch(const std::exception &err){
+		std::cerr << err.what() << std::endl;
+		return 1;
+	}
 
 	return 0;
 }
+
+
+
 
 

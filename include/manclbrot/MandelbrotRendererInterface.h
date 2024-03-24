@@ -8,12 +8,13 @@
 
 class MandelbrotRendererInterface{
 public:
-	MandelbrotRendererInterface(unsigned int screen_width, unsigned int screen_height, SDL_Texture *texture);
+	MandelbrotRendererInterface(const std::string &name, unsigned int screen_width, unsigned int screen_height, SDL_Texture *texture);
 	virtual ~MandelbrotRendererInterface();
 	void set_iter_limit(unsigned long iter_limit);
 	void renew_colors();
 	virtual void draw(double zoom, double offset_x, double offset_y, void *pixels, uint8_t bytes_per_pixel, int pitch) const = 0;
 	void draw(double zoom, double offset_x, double offset_y) const;
+	std::string get_name() const;
 
 protected:
 	unsigned int screen_width;
@@ -32,6 +33,7 @@ private:
 		int8_t dg = 0;
 		int8_t db = 0;
 	};
+	std::string name;
 	std::random_device random_device;
 	std::mt19937_64 random_generator;
 	std::vector<uint32_t> colors;

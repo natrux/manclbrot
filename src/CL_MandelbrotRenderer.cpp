@@ -5,8 +5,8 @@
 
 
 
-CL_MandelbrotRenderer::CL_MandelbrotRenderer(unsigned int screen_width_, unsigned int screen_height_, SDL_Texture *texture_, bool with_buffer_):
-	MandelbrotRendererInterface(screen_width_, screen_height_, texture_),
+CL_MandelbrotRenderer::CL_MandelbrotRenderer(const std::string &name_, unsigned int screen_width_, unsigned int screen_height_, SDL_Texture *texture_, bool with_buffer_):
+	MandelbrotRendererInterface(name_, screen_width_, screen_height_, texture_),
 	with_buffer(with_buffer_)
 {
 	queue = context.create_queue();

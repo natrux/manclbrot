@@ -4,9 +4,10 @@
 #include <stdexcept>
 
 
-MandelbrotRendererInterface::MandelbrotRendererInterface(unsigned int screen_width_, unsigned int screen_height_, SDL_Texture *texture_):
+MandelbrotRendererInterface::MandelbrotRendererInterface(const std::string &name_, unsigned int screen_width_, unsigned int screen_height_, SDL_Texture *texture_):
 	screen_width(screen_width_),
 	screen_height(screen_height_),
+	name(name_),
 	random_generator(random_device()),
 	texture(texture_)
 {

@@ -5,7 +5,7 @@
 
 class MandelbrotRenderer : public MandelbrotRendererInterface{
 public:
-	MandelbrotRenderer(unsigned int screen_width, unsigned int screen_height, SDL_Texture *texture);
+	MandelbrotRenderer(const std::string &name, unsigned int screen_width, unsigned int screen_height, SDL_Texture *texture);
 	void draw(double zoom, double offset_x, double offset_y, void *pixels, uint8_t bytes_per_pixel, int pitch) const override;
 
 private:

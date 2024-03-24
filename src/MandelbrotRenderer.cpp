@@ -1,8 +1,8 @@
 #include <manclbrot/MandelbrotRenderer.h>
 
 
-MandelbrotRenderer::MandelbrotRenderer(unsigned int screen_width_, unsigned int screen_height_, SDL_Texture *texture_):
-	MandelbrotRendererInterface(screen_width_, screen_height_, texture_)
+MandelbrotRenderer::MandelbrotRenderer(const std::string &name_, unsigned int screen_width_, unsigned int screen_height_, SDL_Texture *texture_):
+	MandelbrotRendererInterface(name_, screen_width_, screen_height_, texture_)
 {}
 
 
