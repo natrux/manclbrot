@@ -19,6 +19,7 @@ struct device_t{
 	cl_device_fp_config has_double;
 
 	static std::vector<device_t> find(const platform_t &platform, cl_device_type type=CL_DEVICE_TYPE_ALL);
+	static device_t find(const platform_t &platform, const std::string &name);
 };
 
 

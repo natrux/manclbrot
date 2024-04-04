@@ -88,4 +88,14 @@ std::vector<device_t> device_t::find(const platform_t &platform, cl_device_type 
 }
 
 
+device_t device_t::find(const platform_t &platform, const std::string &name){
+	for(const auto &device : find(platform)){
+		if(device.name == name){
+			return device;
+		}
+	}
+	throw std::runtime_error("No such OpenCL device: '" + name + "'");
+}
+
+
 }

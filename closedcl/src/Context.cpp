@@ -13,19 +13,20 @@ Context::Context():
 }
 
 
-Context::Context(const platform_t &platform):
-	Context(platform, device_t::find(platform))
+Context::Context(const platform_t &platform_):
+	Context(platform_, device_t::find(platform_))
 {
 }
 
 
-Context::Context(const platform_t &platform, cl_device_type type):
-	Context(platform, device_t::find(platform, type))
+Context::Context(const platform_t &platform_, cl_device_type type):
+	Context(platform_, device_t::find(platform_, type))
 {
 }
 
 
-Context::Context(const platform_t &platform, const std::vector<device_t> &devices_):
+Context::Context(const platform_t &platform_, const std::vector<device_t> &devices_):
+	platform(platform_),
 	devices(devices_)
 {
 	const cl_context_properties properties[] = {
@@ -44,8 +45,37 @@ Context::Context(const platform_t &platform, const std::vector<device_t> &device
 }
 
 
+Context::Context(const platform_t &platform_, const std::string &device_name):
+	Context(platform_, {device_t::find(platform_, device_name)})
+{
+}
+
+
+Context::Context(const std::string &platform_name):
+	Context(platform_t::find(platform_name))
+{
+}
+
+
+Context::Context(const std::string &platform_name, cl_device_type type):
+	Context(platform_t::find(platform_name), type)
+{
+}
+
+
+Context::Context(const std::string &platform_name, const std::string &device_name):
+	Context(platform_t::find(platform_name), device_name)
+{
+}
+
+
 Context::~Context(){
 	clReleaseContext(context);
+}
+
+
+platform_t Context::get_platform() const{
+	return platform;
 }
 
 
@@ -64,10 +94,8 @@ std::shared_ptr<CommandQueue> Context::create_queue() const{
 
 std::shared_ptr<CommandQueue> Context::create_queue(const device_t &device) const{
 	const cl_command_queue_properties properties = 0;
-	//const cl_queue_properties properties = 0;
 	cl_int error = CL_SUCCESS;
 	auto queue = clCreateCommandQueue(context, device.id, properties, &error);
-	//auto queue = clCreateCommandQueueWithProperties(context, device.id, &properties, &error);
 	if(error != CL_SUCCESS){
 		throw std::runtime_error("clCreateCommandQueue() failed with: " + error_string(error));
 	}

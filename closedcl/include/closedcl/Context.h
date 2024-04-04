@@ -20,10 +20,15 @@ public:
 	Context(const platform_t &platform);
 	Context(const platform_t &platform, cl_device_type type);
 	Context(const platform_t &platform, const std::vector<device_t> &devices);
+	Context(const platform_t &platform, const std::string &device_name);
+	Context(const std::string &platform_name);
+	Context(const std::string &platform_name, cl_device_type type);
+	Context(const std::string &platform_name, const std::string &device_name);
 	~Context();
 	Context(const Context &other) = delete;
 	Context &operator=(const Context &other) = delete;
 
+	platform_t get_platform() const;
 	std::vector<device_t> get_devices() const;
 	std::shared_ptr<CommandQueue> create_queue() const;
 	std::shared_ptr<CommandQueue> create_queue(const device_t &device) const;
@@ -42,6 +47,7 @@ public:
 
 private:
 	cl_context context;
+	platform_t platform;
 	std::vector<device_t> devices;
 	cl_mem create_buffer_internal(cl_mem_flags flags, size_t size) const;
 };

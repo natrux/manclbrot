@@ -65,6 +65,16 @@ std::vector<platform_t> platform_t::find(){
 }
 
 
+platform_t platform_t::find(const std::string &name){
+	for(const auto &platform : find()){
+		if(platform.name == name){
+			return platform;
+		}
+	}
+	throw std::runtime_error("No such OpenCL platform: '" + name + "'");
+}
+
+
 platform_t platform_t::choose(){
 	const auto platforms = find();
 	if(platforms.empty()){

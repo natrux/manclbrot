@@ -15,6 +15,7 @@ struct platform_t{
 	std::string version;
 
 	static std::vector<platform_t> find();
+	static platform_t find(const std::string &name);
 	static platform_t choose();
 };
 
