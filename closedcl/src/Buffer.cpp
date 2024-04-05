@@ -5,8 +5,9 @@
 namespace closedcl{
 
 
-Buffer::Buffer(cl_mem buffer_):
-	buffer(buffer_)
+Buffer::Buffer(cl_mem buffer_, size_t num_bytes_):
+	buffer(buffer_),
+	m_num_bytes(num_bytes_)
 {
 }
 
@@ -16,13 +17,18 @@ Buffer::~Buffer(){
 }
 
 
-void Buffer::read(CommandQueue &queue, void *data, size_t size) const{
-	queue.read(*this, data, size);
+void Buffer::read(CommandQueue &queue, void *data) const{
+	queue.read(*this, data);
 }
 
 
-void Buffer::write(CommandQueue &queue, const void *data, size_t size){
-	queue.write(*this, data, size);
+void Buffer::write(CommandQueue &queue, const void *data){
+	queue.write(*this, data);
+}
+
+
+size_t Buffer::num_bytes() const{
+	return m_num_bytes;
 }
 
 

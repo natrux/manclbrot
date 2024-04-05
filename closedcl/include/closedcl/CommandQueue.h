@@ -20,8 +20,8 @@ public:
 	CommandQueue(const CommandQueue &other) = delete;
 	CommandQueue &operator=(const CommandQueue &other) = delete;
 
-	void read(const Buffer &buffer, void *data, size_t size);
-	void write(Buffer &buffer, const void *data, size_t size);
+	void read(const Buffer &buffer, void *data);
+	void write(Buffer &buffer, const void *data);
 	void execute(const Kernel &kernel, size_t global);
 	void execute(const Kernel &kernel, const std::vector<size_t> &global);
 	void flush();

@@ -19,19 +19,19 @@ CommandQueue::~CommandQueue(){
 }
 
 
-void CommandQueue::read(const Buffer &buffer, void *data, size_t size){
+void CommandQueue::read(const Buffer &buffer, void *data){
 	const cl_bool blocking = CL_TRUE;
-	const auto error = clEnqueueReadBuffer(queue, buffer.data(), blocking, 0, size, data, 0, NULL, NULL);
+	const auto error = clEnqueueReadBuffer(queue, buffer.data(), blocking, 0, buffer.num_bytes(), data, 0, NULL, NULL);
 	if(error != CL_SUCCESS){
 		throw std::runtime_error("clEnqueueReadBuffer() failed with: " + error_string(error));
 	}
 }
 
 
-void CommandQueue::write(Buffer &buffer, const void *data, size_t size){
+void CommandQueue::write(Buffer &buffer, const void *data){
 	// if blocking, data is also copied and the memory can be reused.
 	const cl_bool blocking = CL_TRUE;
-	const auto error = clEnqueueWriteBuffer(queue, buffer.data(), blocking, 0, size, data, 0, NULL, NULL);
+	const auto error = clEnqueueWriteBuffer(queue, buffer.data(), blocking, 0, buffer.num_bytes(), data, 0, NULL, NULL);
 	if(error != CL_SUCCESS){
 		throw std::runtime_error("clEnqueueWriteBuffer() failed with: " + error_string(error));
 	}

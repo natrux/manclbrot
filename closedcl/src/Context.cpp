@@ -121,7 +121,7 @@ std::shared_ptr<Program> Context::create_program(const std::vector<std::string> 
 
 std::shared_ptr<Buffer> Context::create_buffer(cl_mem_flags flags, size_t size) const{
 	auto buffer = create_buffer_internal(flags, size);
-	return std::make_shared<Buffer>(buffer);
+	return std::make_shared<Buffer>(buffer, size);
 }
 
 

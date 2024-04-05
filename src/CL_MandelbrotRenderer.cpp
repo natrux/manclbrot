@@ -35,8 +35,8 @@ void CL_MandelbrotRenderer::draw(double zoom, double offset_x, double offset_y, 
 
 void CL_MandelbrotRenderer::draw_with_pixels(double zoom, double offset_x, double offset_y, void *pixels, uint8_t bytes_per_pixel, int pitch) const{
 	const size_t num_pixels = screen_width * screen_height;
-	std::vector<unsigned long> result(num_pixels);
-	auto result_cl = context.create_vector<unsigned long>(CL_MEM_WRITE_ONLY, result.size());
+	std::vector<unsigned long> result;
+	auto result_cl = context.create_vector<unsigned long>(CL_MEM_WRITE_ONLY, num_pixels);
 
 	mandelbrot_rect_kernel->set_argument("zoom", zoom);
 	mandelbrot_rect_kernel->set_argument("offset_x", offset_x);
@@ -48,7 +48,7 @@ void CL_MandelbrotRenderer::draw_with_pixels(double zoom, double offset_x, doubl
 
 	queue->execute(*mandelbrot_rect_kernel, {screen_width, screen_height});
 	queue->finish();
-	result_cl->read(*queue, result, result.size());
+	result_cl->read(*queue, result);
 
 	for(size_t i=0; i<screen_width; i++){
 		for(size_t j=0; j<screen_height; j++){
@@ -64,7 +64,7 @@ void CL_MandelbrotRenderer::draw_with_buffer(double zoom, double offset_x, doubl
 	const size_t data_size = screen_height * static_cast<unsigned int>(pitch);
 	const auto iter_limit = get_iter_limit();
 	auto pixels_cl = context.create_buffer(CL_MEM_WRITE_ONLY, data_size);
-	pixels_cl->write(*queue, pixels, data_size);
+	pixels_cl->write(*queue, pixels);
 	auto colors_cl = context.create_vector<uint32_t>(CL_MEM_READ_ONLY, iter_limit);
 	colors_cl->write(*queue, get_colors());
 
@@ -81,6 +81,6 @@ void CL_MandelbrotRenderer::draw_with_buffer(double zoom, double offset_x, doubl
 
 	queue->execute(*mandelbrot_rect_plot_kernel, {screen_width, screen_height});
 	queue->finish();
-	pixels_cl->read(*queue, pixels, data_size);
+	pixels_cl->read(*queue, pixels);
 }
 

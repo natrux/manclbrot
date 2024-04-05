@@ -37,7 +37,7 @@ public:
 	template<class T>
 	std::shared_ptr<Vector<T>> create_vector(cl_mem_flags flags, size_t num_entries) const{
 		auto buffer = create_buffer_internal(flags, num_entries*sizeof(T));
-		return std::make_shared<Vector<T>>(buffer);
+		return std::make_shared<Vector<T>>(buffer, num_entries);
 	}
 	template<class T, size_t N>
 	std::shared_ptr<Array<T, N>> create_array(cl_mem_flags flags) const{
