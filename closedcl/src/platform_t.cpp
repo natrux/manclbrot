@@ -8,20 +8,23 @@ namespace closedcl{
 
 
 std::vector<platform_t> platform_t::find(){
-	std::vector<platform_t> result;
-
 	std::vector<cl_platform_id> platform_ids;
 	{
-		const cl_uint max_num_platforms = 16;
-		platform_ids.resize(max_num_platforms);
 		cl_uint num_platforms = 0;
-		const auto error = clGetPlatformIDs(platform_ids.size(), platform_ids.data(), &num_platforms);
+		const auto error = clGetPlatformIDs(0, NULL, &num_platforms);
 		if(error != CL_SUCCESS){
 			throw std::runtime_error("clGetPlatformIDs() failed with: " + error_string(error));
 		}
 		platform_ids.resize(num_platforms);
 	}
+	{
+		const auto error = clGetPlatformIDs(platform_ids.size(), platform_ids.data(), NULL);
+		if(error != CL_SUCCESS){
+			throw std::runtime_error("clGetPlatformIDs() failed with: " + error_string(error));
+		}
+	}
 
+	std::vector<platform_t> result;
 	for(const auto &platform_id : platform_ids){
 		platform_t platform;
 		platform.id = platform_id;
@@ -35,7 +38,7 @@ std::vector<platform_t> platform_t::find(){
 		}
 		{
 			std::vector<char> data(name_size);
-			const auto error = clGetPlatformInfo(platform_id, CL_PLATFORM_NAME, name_size, data.data(), NULL);
+			const auto error = clGetPlatformInfo(platform_id, CL_PLATFORM_NAME, data.size(), data.data(), NULL);
 			if(error != CL_SUCCESS){
 				throw std::runtime_error("clGetPlatformInfo(CL_PLATFORM_NAME) failed with: " + error_string(error));
 			}
@@ -51,7 +54,7 @@ std::vector<platform_t> platform_t::find(){
 		}
 		{
 			std::vector<char> data(version_size);
-			const auto error = clGetPlatformInfo(platform_id, CL_PLATFORM_VERSION, version_size, data.data(), NULL);
+			const auto error = clGetPlatformInfo(platform_id, CL_PLATFORM_VERSION, data.size(), data.data(), NULL);
 			if(error != CL_SUCCESS){
 				throw std::runtime_error("clGetPlatformInfo(CL_PLATFORM_VERSION) failed with: " + error_string(error));
 			}

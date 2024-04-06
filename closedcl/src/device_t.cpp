@@ -24,7 +24,7 @@ std::vector<device_t> device_t::find(const platform_t &platform, cl_device_type 
 		}
 	}
 
-	std::vector<device_t> devices;
+	std::vector<device_t> result;
 	for(const auto &device_id : device_ids){
 		device_t device;
 		device.id = device_id;
@@ -81,10 +81,10 @@ std::vector<device_t> device_t::find(const platform_t &platform, cl_device_type 
 			}
 		}
 
-		devices.push_back(device);
+		result.push_back(device);
 	}
 
-	return devices;
+	return result;
 }
 
 

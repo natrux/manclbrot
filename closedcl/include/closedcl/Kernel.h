@@ -13,7 +13,7 @@ namespace closedcl{
 
 class Kernel{
 public:
-	Kernel(cl_kernel kernel, size_t max_name_size=64);
+	Kernel(cl_kernel kernel);
 	~Kernel();
 	Kernel(const Kernel &other) = delete;
 	Kernel &operator=(const Kernel &other) = delete;

@@ -9,7 +9,7 @@
 namespace closedcl{
 
 
-Kernel::Kernel(cl_kernel kernel_, size_t max_name_size):
+Kernel::Kernel(cl_kernel kernel_):
 	kernel(kernel_)
 {
 	cl_uint num_arguments = 0;
@@ -20,17 +20,29 @@ Kernel::Kernel(cl_kernel kernel_, size_t max_name_size):
 		}
 	}
 	for(cl_uint i=0; i<num_arguments; i++){
-		std::vector<char> name_chr(max_name_size);
-		size_t actual_size = 0;
-		const auto error = clGetKernelArgInfo(kernel, i, CL_KERNEL_ARG_NAME, name_chr.size(), name_chr.data(), &actual_size);
-		if(error != CL_SUCCESS){
-			throw std::runtime_error("clGetKernelArgInfo(CL_KERNEL_ARG_NAME) failed with: " + error_string(error));
+		size_t name_size = 0;
+		std::vector<char> name_chr;
+		while(true){
+			name_chr.resize(name_size);
+			size_t actual_size = 0;
+			const auto error = clGetKernelArgInfo(kernel, i, CL_KERNEL_ARG_NAME, name_chr.size(), name_chr.data(), &actual_size);
+			if(actual_size >= name_size || error == CL_INVALID_VALUE){
+				// Buffer too small, try again with bigger buffer
+				// OpenCL >=2.2 tells us the actual_size, for OpenCL <2.2 we do exponential growth
+				name_size = std::max(2*name_size, actual_size+1);
+				if(name_size == 1){
+					// (with kickstart)
+					name_size = 32;
+				}
+			}else if(error != CL_SUCCESS){
+				throw std::runtime_error("clGetKernelArgInfo(CL_KERNEL_ARG_NAME) failed with: " + error_string(error));
+			}else if(actual_size == 0){
+				throw std::runtime_error("Kernel argument name has length 0");
+			}else{
+				name_chr.resize(actual_size-1);
+				break;
+			}
 		}
-		if(actual_size == 0){
-			throw std::runtime_error("Kernel argument name has length 0");
-		}
-		name_chr.resize(actual_size-1);
-
 		const std::string name(name_chr.begin(), name_chr.end());
 		arguments[name] = i;
 	}
