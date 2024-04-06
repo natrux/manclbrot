@@ -99,7 +99,7 @@ std::shared_ptr<CommandQueue> Context::create_queue(const device_t &device) cons
 	if(error != CL_SUCCESS){
 		throw std::runtime_error("clCreateCommandQueue() failed with: " + error_string(error));
 	}
-	return std::make_shared<CommandQueue>(queue);
+	return std::make_shared<CommandQueue>(queue, device);
 }
 
 

@@ -75,9 +75,33 @@ std::vector<device_t> device_t::find(const platform_t &platform, cl_device_type 
 		}
 
 		{
-			const auto error = clGetDeviceInfo(device_id, CL_DEVICE_DOUBLE_FP_CONFIG, sizeof(device.has_double), &device.has_double, NULL);
+			const auto error = clGetDeviceInfo(device_id, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(device.max_work_group_size), &device.max_work_group_size, NULL);
 			if(error != CL_SUCCESS){
-				throw std::runtime_error("clGetDeiceInfo(CL_DEVICE_DOUBLE_FP_CONFIG) failed with: " + error_string(error));
+				throw std::runtime_error("clGetDeviceInfo(CL_DEVICE_MAX_WORK_GROUP_SIZE) failed with: " + error_string(error));
+			}
+		}
+
+		{
+			cl_uint max_work_item_dimensions;
+			const auto error = clGetDeviceInfo(device_id, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(max_work_item_dimensions), &max_work_item_dimensions, NULL);
+			if(error != CL_SUCCESS){
+				throw std::runtime_error("clGetDeviceInfo(CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS) failed with: " + error_string(error));
+			}
+			device.max_work_item_sizes.resize(max_work_item_dimensions);
+		}
+		{
+			const auto buffer = device.max_work_item_sizes.data();
+			const auto size = device.max_work_item_sizes.size() * sizeof(decltype(device.max_work_item_sizes)::value_type);
+			const auto error = clGetDeviceInfo(device_id, CL_DEVICE_MAX_WORK_ITEM_SIZES, size, buffer, NULL);
+			if(error != CL_SUCCESS){
+				throw std::runtime_error("clGetDeviceInfo(CL_DEVICE_MAX_WORK_ITEM_SIZES) failed with: " + error_string(error));
+			}
+		}
+
+		{
+			const auto error = clGetDeviceInfo(device_id, CL_DEVICE_DOUBLE_FP_CONFIG, sizeof(device.double_fp_config), &device.double_fp_config, NULL);
+			if(error != CL_SUCCESS){
+				throw std::runtime_error("clGetDeviceInfo(CL_DEVICE_DOUBLE_FP_CONFIG) failed with: " + error_string(error));
 			}
 		}
 
@@ -95,6 +119,11 @@ device_t device_t::find(const platform_t &platform, const std::string &name){
 		}
 	}
 	throw std::runtime_error("No such OpenCL device: '" + name + "'");
+}
+
+
+bool device_t::has_double() const{
+	return (double_fp_config != 0);
 }
 
 

@@ -16,10 +16,14 @@ struct device_t{
 	cl_device_type type;
 	std::string name;
 	std::string version;
-	cl_device_fp_config has_double;
+	size_t max_work_group_size;
+	std::vector<size_t> max_work_item_sizes;
+	cl_device_fp_config double_fp_config;
 
 	static std::vector<device_t> find(const platform_t &platform, cl_device_type type=CL_DEVICE_TYPE_ALL);
 	static device_t find(const platform_t &platform, const std::string &name);
+
+	bool has_double() const;
 };
 
 
