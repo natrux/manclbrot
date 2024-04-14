@@ -7,6 +7,13 @@
 namespace closedcl{
 
 
+template<class T>
+static size_t buffer_size(const std::vector<T> &vector){
+	return vector.size() * sizeof(T);
+}
+
+
+
 Program::Program(cl_program program_):
 	program(program_)
 {
@@ -53,6 +60,54 @@ void Program::build(const std::vector<std::string> &options, const std::vector<d
 		}
 		throw std::runtime_error(str_error);
 	}
+}
+
+
+std::vector<std::pair<device_t, std::string>> Program::get_binaries() const{
+	size_t num_devices = 0;
+	{
+		const auto error = clGetProgramInfo(program, CL_PROGRAM_NUM_DEVICES, sizeof(num_devices), &num_devices, NULL);
+		if(error != CL_SUCCESS){
+			throw std::runtime_error("clGetProgramInfo(CL_PROGRAM_NUM_DEVICES) failed with: " + error_string(error));
+		}
+	}
+	std::vector<cl_device_id> device_ids(num_devices);
+	{
+		const auto error = clGetProgramInfo(program, CL_PROGRAM_DEVICES, buffer_size(device_ids), device_ids.data(), NULL);
+		if(error != CL_SUCCESS){
+			throw std::runtime_error("clGetProgramInfo(CL_PROGRAM_DEVICES) failed with: " + error_string(error));
+		}
+	}
+	std::vector<std::vector<unsigned char>> binaries(num_devices);
+	{
+		std::vector<size_t> binary_sizes(num_devices);
+		const auto error = clGetProgramInfo(program, CL_PROGRAM_BINARY_SIZES, buffer_size(binary_sizes), binary_sizes.data(), NULL);
+		if(error != CL_SUCCESS){
+			throw std::runtime_error("clGetProgramInfo(CL_PROGRAM_BINARY_SIZES) failed with: " + error_string(error));
+		}
+		for(size_t i=0; i<num_devices; i++){
+			binaries[i].resize(binary_sizes[i]);
+		}
+	}
+	{
+		std::vector<unsigned char *> binaries_param;
+		for(auto &binary : binaries){
+			binaries_param.push_back(binary.data());
+		}
+		const auto error = clGetProgramInfo(program, CL_PROGRAM_BINARIES, buffer_size(binaries_param), binaries_param.data(), NULL);
+		if(error != CL_SUCCESS){
+			throw std::runtime_error("clGetProgramInfo(CL_PROGRAM_BINARIES) failed with: " + error_string(error));
+		}
+	}
+
+	std::vector<std::pair<device_t, std::string>> result;
+	for(size_t i=0; i<num_devices; i++){
+		std::pair<device_t, std::string> entry;
+		entry.first = device_t::from_id(device_ids[i]);
+		entry.second = std::string(binaries[i].begin(), binaries[i].end());
+		result.push_back(entry);
+	}
+	return result;
 }
 
 

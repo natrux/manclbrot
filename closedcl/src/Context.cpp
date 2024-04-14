@@ -113,7 +113,32 @@ std::shared_ptr<Program> Context::create_program(const std::vector<std::string> 
 	cl_int error = CL_SUCCESS;
 	auto program = clCreateProgramWithSource(context, sources_.size(), sources_.data(), sizes.data(), &error);
 	if(error != CL_SUCCESS){
-		throw std::runtime_error("clCreateProgram() failed with: " + error_string(error));
+		throw std::runtime_error("clCreateProgramWithSource() failed with: " + error_string(error));
+	}
+	return std::make_shared<Program>(program);
+}
+
+
+std::shared_ptr<Program> Context::create_program(const std::vector<std::pair<device_t, std::string>> &binaries) const{
+	std::vector<cl_device_id> device_ids;
+	std::vector<size_t> binary_lengths;
+	std::vector<const unsigned char *> binary_code;
+	for(const auto &entry : binaries){
+		device_ids.push_back(entry.first.id);
+		binary_lengths.push_back(entry.second.size());
+		binary_code.push_back(reinterpret_cast<const unsigned char *>(entry.second.c_str()));
+	}
+	std::vector<cl_int> binary_status(binary_code.size(), CL_SUCCESS);
+	cl_int error = CL_SUCCESS;
+	auto program = clCreateProgramWithBinary(context, device_ids.size(), device_ids.data(), binary_lengths.data(), binary_code.data(), binary_status.data(), &error);
+	for(size_t i=0; i<device_ids.size(); i++){
+		const auto status = binary_status[i];
+		if(status != CL_SUCCESS){
+			throw std::runtime_error("clCreateProgramWithBinary() failed at device '" + binaries[i].first.name + "' with: " + error_string(status));
+		}
+	}
+	if(error != CL_SUCCESS){
+		throw std::runtime_error("clCreateProgramWithBinary() failed with: " + error_string(error));
 	}
 	return std::make_shared<Program>(program);
 }

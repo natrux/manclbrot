@@ -33,6 +33,7 @@ public:
 	std::shared_ptr<CommandQueue> create_queue() const;
 	std::shared_ptr<CommandQueue> create_queue(const device_t &device) const;
 	std::shared_ptr<Program> create_program(const std::vector<std::string> &sources) const;
+	std::shared_ptr<Program> create_program(const std::vector<std::pair<device_t, std::string>> &binaries) const;
 	std::shared_ptr<Buffer> create_buffer(cl_mem_flags flags, size_t size) const;
 	template<class T>
 	std::shared_ptr<Vector<T>> create_vector(cl_mem_flags flags, size_t num_entries) const{
