@@ -17,7 +17,12 @@ CL_MandelbrotRenderer::CL_MandelbrotRenderer(const std::string &name_, unsigned 
 		throw std::runtime_error("Opening file " + path + " failed");
 	}
 	const std::string src = std::string(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>());
-	mandelbrot = context.create_program({src});
+	{
+		auto other_program = context.create_program({src});
+		other_program->build({"-cl-kernel-arg-info"}, context.get_devices());
+		const auto binaries = other_program->get_binaries();
+		mandelbrot = context.create_program(binaries);
+	}
 	mandelbrot->build({"-cl-kernel-arg-info"}, context.get_devices());
 	mandelbrot_rect_kernel = mandelbrot->create_kernel("mandelbrot_rect");
 	mandelbrot_rect_plot_kernel = mandelbrot->create_kernel("mandelbrot_rect_plot");
