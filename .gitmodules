@@ -1,0 +1,3 @@
+[submodule "wideopencl"]
+	path = wideopencl
+	url = https://github.com/natrux/wideopencl

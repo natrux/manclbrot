@@ -1,6 +1,6 @@
 #include <manclbrot/MandelbrotRenderer.h>
 #include <manclbrot/CL_MandelbrotRenderer.h>
-#include <closedcl/Context.h>
+#include <wideopencl/Context.h>
 
 #include <string>
 #include <stdexcept>

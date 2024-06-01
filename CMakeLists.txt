@@ -20,7 +20,7 @@ endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_definitions(-D CL_TARGET_OPENCL_VERSION=120)
 
-add_subdirectory(closedcl)
+add_subdirectory(wideopencl)
 
 find_package(SDL2 REQUIRED)
 
@@ -37,7 +37,7 @@ target_include_directories(manclbrot PUBLIC
 )
 
 target_link_libraries(manclbrot
-	closedcl
+	wideopencl
 	${SDL2_LIBRARIES}
 )
 

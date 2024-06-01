@@ -2,7 +2,7 @@
 
 #include <manclbrot/MandelbrotRendererInterface.h>
 
-#include <closedcl/Context.h>
+#include <wideopencl/Context.h>
 
 
 
@@ -16,9 +16,9 @@ public:
 
 private:
 	bool with_buffer = true;
-	closedcl::Context context;
-	std::shared_ptr<closedcl::CommandQueue> queue;
-	std::shared_ptr<closedcl::Program> mandelbrot;
-	std::shared_ptr<closedcl::Kernel> mandelbrot_rect_kernel;
-	std::shared_ptr<closedcl::Kernel> mandelbrot_rect_plot_kernel;
+	wideopencl::Context context;
+	std::shared_ptr<wideopencl::CommandQueue> queue;
+	std::shared_ptr<wideopencl::Program> mandelbrot;
+	std::shared_ptr<wideopencl::Kernel> mandelbrot_rect_kernel;
+	std::shared_ptr<wideopencl::Kernel> mandelbrot_rect_plot_kernel;
 };
